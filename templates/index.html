@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Textract OCR Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+    h1 { margin-bottom: 5px; }
+    .flash { padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+    .flash.error { background: #ffe0e0; }
+    .flash.success { background: #e0ffe3; }
+    .image-card { border: 1px solid #ddd; border-radius: 6px; padding: 10px; margin-bottom: 15px; display: flex; gap: 12px; }
+    .image-card img { max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; }
+    .ocr-text { white-space: pre-wrap; font-size: 0.9rem; background: #f7f7f7; padding: 8px; border-radius: 4px; border: 1px solid #eee; }
+    .upload-form { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Textract OCR Dashboard</h1>
+  <p>User: {{ user_id }}</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="upload-form">
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+      <label>Upload a document image (JPG/PNG/PDF):</label><br />
+      <input type="file" name="file" required />
+      <button type="submit">Upload</button>
+    </form>
+  </div>
+
+  <hr />
+
+  <h2>Your Uploaded Images & Extracted Text</h2>
+
+  {% if images %}
+    {% for img in images %}
+      <div class="image-card">
+        <div>
+          <img src="{{ img.url }}" alt="{{ img.filename }}" />
+        </div>
+        <div>
+          <h3>{{ img.filename }}</h3>
+          <strong>Extracted Text:</strong>
+          <div class="ocr-text">
+            {{ img.ocr_text }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No images uploaded yet.</p>
+  {% endif %}
+</body>
+</html>
